@@ -17,14 +17,14 @@ export class Usuario {
     @Column()
     apellido: string;
 
-    @Column()
-    email: string;
-
     @Column({ nullable: true })
     telefono?: string;
 
     @Column({ nullable: true })
     direccion?: string;
+
+    @Column({ default: true })
+    activo: boolean;
 
     @CreateDateColumn()
     fechaRegistro: Date;

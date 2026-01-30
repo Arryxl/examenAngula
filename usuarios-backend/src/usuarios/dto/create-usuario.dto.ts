@@ -18,10 +18,6 @@ export class CreateUsuarioDto {
     @IsNotEmpty()
     apellido: string;
 
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
-
     @IsString()
     @IsOptional()
     telefono?: string;

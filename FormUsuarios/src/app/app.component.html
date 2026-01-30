@@ -36,7 +36,6 @@
                 </div>
               </div>
 
-
               <div class="col-md-4">
                 <div class="form-floating">
                   <input type="text" class="form-control" id="nombre" name="nombre" [(ngModel)]="nombre" required maxlength="15" placeholder="Nombre">
@@ -50,7 +49,6 @@
                   <label for="apellido">Apellido</label>
                 </div>
               </div>
-              
               
               <div class="col-md-4">
                 <div class="form-floating">
@@ -75,7 +73,7 @@
 
 <div class="container-fluid py-4">
   <div class="row justify-content-center">
-    <div class=" col-xl-10">
+    <div class="col-xl-10">
       <div class="card shadow rounded-4">
         <div class="card-header bg-secondary text-white">
           <h5 class="mb-0 d-flex justify-content-between">
@@ -85,27 +83,29 @@
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0 text-center">
+            <table class="table table-hover table-striped mb-0 text-center align-middle">
               <thead class="table-dark">
                 <tr>
                   <th scope="col" class="text-center">#</th>
-                  <th scope="col">Tipo Documento</th>
-                  <th scope="col">N Documento</th>
+                  <th scope="col">Tipo Doc</th>
+                  <th scope="col">N° Doc</th>
                   <th scope="col">Nombre</th>
                   <th scope="col">Apellido</th>
                   <th scope="col">Dirección</th>
                   <th scope="col">Teléfono</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody *ngFor="let usuario of usuarios">
                 <tr *ngIf="usuarios.length === 0">
-                  <td colspan="7" class="text-center py-5">
+                  <td colspan="9" class="text-center py-5">
                     <h5>No hay usuarios</h5>
                     <p class="mb-0">Agrega usuarios usando el formulario</p>
                   </td>
                 </tr>
-                <tr *ngFor="let usuario of usuarios; let i = index">
-                  <th scope="row" class="text-center">{{i + 1}}</th>
+                <tr *ngIf="usuario.activo">
+                  <th scope="row" class="text-center">{{usuario.id}}</th>
                   <td>
                     <span class="badge bg-primary" *ngIf="usuario.tipoDocumento === 'Pasaporte'">{{usuario.tipoDocumento}}</span>
                     <span class="badge bg-success" *ngIf="usuario.tipoDocumento === 'C.C.'">{{usuario.tipoDocumento}}</span>
@@ -117,6 +117,21 @@
                   <td>{{usuario.apellido}}</td>
                   <td>{{usuario.direccion}}</td>
                   <td>{{usuario.telefono}}</td>
+                  <td>
+                    <span class="badge"  [class.bg-success]="usuario.activo" [class.bg-danger]="!usuario.activo">
+                      {{usuario.activo ? 'Activo' : 'Inactivo'}}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group btn-group-sm">
+                      <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editarModal" (click)="abrirModalEditar(usuario)">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#eliminarModal" (click)="abrirModalEliminar(usuario)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -126,4 +141,71 @@
     </div>
   </div>
 </div>
- 
+
+<div class="modal fade" id="editarModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content modal-custom">
+      <div class="modal-header-custom">
+        <h5 class="modal-title-custom">Actualizar Información</h5>
+      </div>
+      <div class="modal-body-custom" *ngIf="usuarioSeleccionado">
+        <form>
+          <div class="input-group-custom">
+            <label class="label-custom">Tipo de Documento</label>
+            <select class="select-custom" [(ngModel)]="usuarioSeleccionado.tipoDocumento" name="tipoDoc">
+              <option value="Pasaporte">Pasaporte</option>
+              <option value="C.C.">Cédula de Ciudadanía</option>
+              <option value="C.E.">Cédula de extranjería</option>
+              <option value="T.I.">Tarjeta de Identidad</option>
+            </select>
+          </div>
+          <div class="input-group-custom">
+            <label class="label-custom">N° Documento</label>
+            <input type="text" class="input-custom" [(ngModel)]="usuarioSeleccionado.numeroDocumento" name="numDoc">
+          </div>
+          <div class="row-custom">
+            <div class="col-custom">
+              <label class="label-custom">Nombre</label>
+              <input type="text" class="input-custom" [(ngModel)]="usuarioSeleccionado.nombre" name="nombre">
+            </div>
+            <div class="col-custom">
+              <label class="label-custom">Apellido</label>
+              <input type="text" class="input-custom" [(ngModel)]="usuarioSeleccionado.apellido" name="apellido">
+            </div>
+          </div>
+          <div class="input-group-custom">
+            <label class="label-custom">Dirección</label>
+            <input type="text" class="input-custom" [(ngModel)]="usuarioSeleccionado.direccion" name="direccion">
+          </div>
+          <div class="input-group-custom">
+            <label class="label-custom">Teléfono</label>
+            <input type="text" class="input-custom" [(ngModel)]="usuarioSeleccionado.telefono" name="telefono">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn-save" (click)="guardarEdicion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="eliminarModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-delete">
+      <div class="modal-delete-content" *ngIf="usuarioSeleccionado">
+        <h4>¿Desactivar Usuario?</h4>
+        <p>Esta acción cambiará el estado de:</p>
+        <div class="user-info">
+          <strong>{{usuarioSeleccionado.nombre}} {{usuarioSeleccionado.apellido}}</strong>
+          <span>{{usuarioSeleccionado.numeroDocumento}}</span>
+        </div>
+      </div>
+      <div class="modal-delete-actions">
+        <button type="button" class="btn-cancel-delete" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn-confirm-delete" (click)="confirmarEliminacion()">Sí</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,51 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { Usuario } from './entities/usuario.entity';
 
 @Injectable()
 export class UsuariosService {
-    private usuarios: Usuario[] = [];
-    private idCounter = 1;
+    constructor(
+        @InjectRepository(Usuario)
+        private usuariosRepository: Repository<Usuario>,
+    ) {}
 
-    create(createUsuarioDto: CreateUsuarioDto): Usuario {
-    const nuevoUsuario: Usuario = {
-        id: this.idCounter++,
-        ...createUsuarioDto,
-        fechaRegistro: new Date(),
-    };
-    this.usuarios.push(nuevoUsuario);
-    return nuevoUsuario;
+    async create(createUsuarioDto: CreateUsuarioDto): Promise<Usuario> {
+        const usuario = this.usuariosRepository.create(createUsuarioDto);
+        return await this.usuariosRepository.save(usuario);
     }
 
-    findAll(): Usuario[] {
-    return this.usuarios;
+    async findAll(): Promise<Usuario[]> {
+        return await this.usuariosRepository.find();
     }
 
-    findOne(id: number): Usuario {
-    const usuario = this.usuarios.find(usr => usr.id === id);
-    if (!usuario) {
-        throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
-    }
-    return usuario;
-    }
-
-    update(id: number, updateUsuarioDto: UpdateUsuarioDto): Usuario {
-    const usuario = this.findOne(id);
-    const index = this.usuarios.indexOf(usuario);
-    
-    const usuarioActualizado = {
-        ...usuario,
-        ...updateUsuarioDto,
-    };
-    
-    this.usuarios[index] = usuarioActualizado;
-    return usuarioActualizado;
+    async findOne(id: number): Promise<Usuario> {
+        const usuario = await this.usuariosRepository.findOneBy({ id });
+        if (!usuario) {
+            throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+        }
+        return usuario;
     }
 
-    remove(id: number): void {
-    const usuario = this.findOne(id);
-    const index = this.usuarios.indexOf(usuario);
-    this.usuarios.splice(index, 1);
+    async update(id: number, updateUsuarioDto: UpdateUsuarioDto): Promise<Usuario> {
+        await this.findOne(id);
+        await this.usuariosRepository.update(id, updateUsuarioDto);
+        return await this.findOne(id);
+    }
+
+    async remove(id: number): Promise<Usuario> {
+        const usuario = await this.findOne(id);
+        usuario.activo = false;
+        return await this.usuariosRepository.save(usuario);
     }
 }

@@ -11,23 +11,25 @@ export class AppComponent {
   title = 'FormUsuarios';
   
   usuarios: Usuario[] = [];
+  usuarioSeleccionado: Usuario | null = null;
+  modoEdicion: boolean = false;
 
   cargarUsuarios(): void {
     this.usuariosService.getUsuarios().subscribe({
       next: (data) => {
-        console.log('✅ Usuarios cargados:', data);
+        console.log(data);
         this.usuarios = data;
       },
-      error: (err) => console.error('❌ Error al cargar usuarios:', err)
+      error: (err) => console.error(err)
     });
   }
 
   tipoDocumento: string = '';
-  numeroDocumento: string = '';
+  numeroDocumento: any = '';
   nombre: string = '';
   apellido: string = '';
   direccion: string = '';
-  telefono: string = '';
+  telefono: any = '';
 
   validarFormulario(): boolean {
 
@@ -36,7 +38,7 @@ export class AppComponent {
       return false;
     }
     const numDocString = String(this.numeroDocumento).trim();
-    if (numDocString === '' || numDocString.includes(' ')) {
+    if (numDocString === '' || numDocString === 'null' || numDocString === 'undefined') {
       alert('ingrese un número de documento válido');
       return false;
     }
@@ -54,7 +56,7 @@ export class AppComponent {
       return false;
     }
     const telefonoString = String(this.telefono).trim();
-    if (telefonoString === '' || telefonoString.includes(' ')) {
+    if (telefonoString === '' || telefonoString === 'null' || telefonoString === 'undefined') {
       alert('ingrese un teléfono válido');
       return false;
     }
@@ -66,8 +68,23 @@ export class AppComponent {
     if (!this.validarFormulario()) {
       return;
     }
-    
-    this.borrarDatos();
+
+    const nuevoUsuario: Usuario = {
+      tipoDocumento: this.tipoDocumento,
+      numeroDocumento: String(this.numeroDocumento),
+      nombre: this.nombre,
+      apellido: this.apellido,
+      direccion: this.direccion,
+      telefono: String(this.telefono)
+    };
+
+    this.usuariosService.createUsuario(nuevoUsuario).subscribe({
+      next: () => {
+        this.cargarUsuarios();
+        this.borrarDatos();
+      },
+      error: (err) => console.error(err)
+    });
   }
 
   borrarDatos() {
@@ -77,6 +94,48 @@ export class AppComponent {
     this.apellido = '';
     this.direccion = '';
     this.telefono = '';
+  }
+
+  abrirModalEditar(usuario: Usuario) {
+    this.usuarioSeleccionado = { ...usuario };
+  }
+
+  guardarEdicion() {
+    if (!this.usuarioSeleccionado || !this.usuarioSeleccionado.id) return;
+
+    this.usuariosService.updateUsuario(this.usuarioSeleccionado.id, this.usuarioSeleccionado).subscribe({
+      next: () => {
+        this.cargarUsuarios();
+        this.cerrarModal('editarModal');
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  abrirModalEliminar(usuario: Usuario) {
+    this.usuarioSeleccionado = usuario;
+  }
+
+  confirmarEliminacion() {
+    if (!this.usuarioSeleccionado || !this.usuarioSeleccionado.id) return;
+
+    this.usuariosService.deleteUsuario(this.usuarioSeleccionado.id).subscribe({
+      next: () => {
+        this.cargarUsuarios();
+        this.cerrarModal('eliminarModal');
+      },
+      error: (err) => console.error(err)
+    });
+  }
+
+  cerrarModal(modalId: string) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
+    }
   }
 
   ngOnInit() {

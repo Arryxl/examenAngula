@@ -1,0 +1,129 @@
+<div class="container-fluid bg-light py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      <div class="card shadow-lg rounded-4">
+        <div class="card-header text-center">
+          <h3 class="mb-0">Registro de Usuarios</h3>
+        </div>
+        <div class="card-body p-4">
+          <form #formulario="ngForm">
+            <div class="row g-3">
+
+              <div class="col-md-5">
+                <div class="form-floating">
+                  <select class="form-select" id="tipoDocumento" name="tipoDocumento" [(ngModel)]="tipoDocumento" required>
+                    <option value="">Seleccione</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="C.C.">Cédula de Ciudadanía</option>
+                    <option value="C.E.">Cédula de extranjería</option>
+                    <option value="T.I.">Tarjeta de Identidad</option>
+                  </select>
+                  <label for="tipoDocumento">Tipo de documento</label>
+                </div>
+              </div>
+              
+              <div class="col-md-7">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="numeroDocumento" name="numeroDocumento" [(ngModel)]="numeroDocumento" required maxlength="15" placeholder="Número">
+                  <label for="numeroDocumento">Número de Documento</label>
+                </div>
+              </div>
+              
+              <div class="col-md-12">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="direccion" name="direccion" [(ngModel)]="direccion" required maxlength="100" placeholder="Dirección">
+                  <label for="direccion">Dirección</label>
+                </div>
+              </div>
+
+
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="nombre" name="nombre" [(ngModel)]="nombre" required maxlength="15" placeholder="Nombre">
+                  <label for="nombre">Nombre</label>
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="apellido" name="apellido" [(ngModel)]="apellido" required maxlength="15" placeholder="Apellido">
+                  <label for="apellido">Apellido</label>
+                </div>
+              </div>
+              
+              
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="telefono" name="telefono" [(ngModel)]="telefono" required maxlength="15" placeholder="Teléfono">
+                  <label for="telefono">Teléfono</label>
+                </div>
+              </div>
+              
+              <div class="col-md-12 mt-4">
+                <div class="d-flex justify-content-center gap-3">
+                  <button type="button" (click)="enviarDatos()" class="btn btn-primary px-5 shadow-lg">Guardar</button>
+                  <button type="button" (click)="borrarDatos()" class="btn btn-secondary px-5 shadow-lg">Borrar</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class=" col-xl-10">
+      <div class="card shadow rounded-4">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0 d-flex justify-content-between">
+            Lista de Usuarios 
+            <span class="badge bg-light text-dark ms-2">Usuarios: {{usuarios.length}}</span>
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 text-center">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col" class="text-center">#</th>
+                  <th scope="col">Tipo Documento</th>
+                  <th scope="col">N Documento</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Apellido</th>
+                  <th scope="col">Dirección</th>
+                  <th scope="col">Teléfono</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="usuarios.length === 0">
+                  <td colspan="7" class="text-center py-5">
+                    <h5>No hay usuarios</h5>
+                    <p class="mb-0">Agrega usuarios usando el formulario</p>
+                  </td>
+                </tr>
+                <tr *ngFor="let usuario of usuarios; let i = index">
+                  <th scope="row" class="text-center">{{i + 1}}</th>
+                  <td>
+                    <span class="badge bg-primary" *ngIf="usuario.tipoDocumento === 'Pasaporte'">{{usuario.tipoDocumento}}</span>
+                    <span class="badge bg-success" *ngIf="usuario.tipoDocumento === 'C.C.'">{{usuario.tipoDocumento}}</span>
+                    <span class="badge bg-warning text-dark" *ngIf="usuario.tipoDocumento === 'C.E.'">{{usuario.tipoDocumento}}</span>
+                    <span class="badge bg-info" *ngIf="usuario.tipoDocumento === 'T.I.'">{{usuario.tipoDocumento}}</span>
+                  </td>
+                  <td>{{usuario.numeroDocumento}}</td>
+                  <td>{{usuario.nombre}}</td>
+                  <td>{{usuario.apellido}}</td>
+                  <td>{{usuario.direccion}}</td>
+                  <td>{{usuario.telefono}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ 
